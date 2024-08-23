@@ -1,14 +1,20 @@
 from django.http.request import HttpRequest
-from django.template.context_processors import request
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet
 
-from profiles_api.serializers import HelloSerializer
+from profiles_api.models import UserProfile
+from profiles_api.serializers import HelloSerializer, UserProfileSerializer
 
 
-# Create your views here.
+class UserProfileViewSet(ModelViewSet):
+    """Handle creating and updating profiles"""
+
+    serializer_class = UserProfileSerializer
+    queryset = UserProfile.objects.all()
+
+
 class HelloApiView(APIView):
     """Test API View"""
 
