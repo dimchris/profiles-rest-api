@@ -1,14 +1,40 @@
 from django.http.request import HttpRequest
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
-from profiles_api.models import UserProfile
-from profiles_api.permissions import UpdateOwnProfile
-from profiles_api.serializers import HelloSerializer, UserProfileSerializer
-from rest_framework.filters import SearchFilter
+from profiles_api.models import ProfileFeedItem, UserProfile
+from profiles_api.permissions import UpdateOwnProfile, UpdateOwnStatus
+from profiles_api.serializers import (
+    HelloSerializer,
+    ProfileFeedItemSerializer,
+    UserProfileSerializer,
+)
+
+
+class UserProfileFeedViewSet(ModelViewSet):
+    """Handlers creating and updating feeding items"""
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, UpdateOwnStatus)
+    serializer_class = ProfileFeedItemSerializer
+    queryset = ProfileFeedItem.objects.all()
+
+    def perform_create(self, serializer):
+        """Sets the user profile to the logged in user"""
+        serializer.save(user_profile=self.request.user)
+
+
+class UserLoginApiView(ObtainAuthToken):
+    """Handle creating user authentication tokens"""
+
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
 class UserProfileViewSet(ModelViewSet):
