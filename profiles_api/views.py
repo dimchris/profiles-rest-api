@@ -8,6 +8,7 @@ from rest_framework.viewsets import ModelViewSet, ViewSet
 from profiles_api.models import UserProfile
 from profiles_api.permissions import UpdateOwnProfile
 from profiles_api.serializers import HelloSerializer, UserProfileSerializer
+from rest_framework.filters import SearchFilter
 
 
 class UserProfileViewSet(ModelViewSet):
@@ -17,6 +18,8 @@ class UserProfileViewSet(ModelViewSet):
     queryset = UserProfile.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (UpdateOwnProfile,)
+    filter_backends = (SearchFilter,)
+    search_fields = ("name", "email")
 
 
 class HelloApiView(APIView):
